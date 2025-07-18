@@ -20,6 +20,7 @@ accordingly
   <url>http://YourGitHubUserInLowerCase.github.io/JoyOfCodingSummer2025</url>
   <modules>
     <module>student</module>
+    <module>apptbook</module>
   </modules>
   <inceptionYear>2025</inceptionYear>
   <organization>
