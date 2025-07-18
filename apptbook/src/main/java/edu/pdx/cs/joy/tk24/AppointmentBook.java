@@ -2,27 +2,60 @@ package edu.pdx.cs.joy.tk24;
 
 import edu.pdx.cs.joy.AbstractAppointmentBook;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+
+/**
+ * Represents an appointment book that belongs to a specific owner
+ * and stores multiple appointments.
+ */
 
 public class AppointmentBook extends AbstractAppointmentBook<Appointment> {
   private final String owner;
+  private final List<Appointment> appointments;
 
+
+  /**
+   * Creates a new appointment book for the given owner.
+   * @param owner The name of the appointment book owner.
+   */
   public AppointmentBook(String owner) {
     this.owner = owner;
+    this.appointments = new ArrayList<>();
   }
 
+  /**
+   * Returns the name of the owner of this appointment book.
+   *
+   * @return The owner's name.
+   */
   @Override
   public String getOwnerName() {
+
     return this.owner;
   }
 
+  /**
+   * Returns all appointments currently in the appointment book.
+   *
+   * @return A collection of all {@link Appointment} objects in the book.
+   */
   @Override
   public Collection<Appointment> getAppointments() {
-    throw new UnsupportedOperationException("This method is not implemented yet");
+    //throw new UnsupportedOperationException("This method is not implemented yet");
+    return this.appointments;
   }
 
+  /**
+   * Adds a new appointment to this appointment book.
+   *
+   * @param appt The {@link Appointment} to add.
+   */
   @Override
   public void addAppointment(Appointment appt) {
-    throw new UnsupportedOperationException("This method is not implemented yet");
+    //throw new UnsupportedOperationException("This method is not implemented yet");
+    this.appointments.add(appt);
   }
 }

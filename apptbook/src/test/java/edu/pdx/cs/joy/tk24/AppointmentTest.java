@@ -19,24 +19,37 @@ public class AppointmentTest {
    */
   @Test
   void getBeginTimeStringNeedsToBeImplemented() {
-    Appointment appointment = new Appointment();
-    assertThrows(UnsupportedOperationException.class, appointment::getBeginTimeString);
+    Appointment appointment = new Appointment("Doctor appointment", "7/18/2025 14:00", "7/18/2025 15:00");
+    //assertThrows(UnsupportedOperationException.class, appointment::getBeginTimeString);
+    assertThat(appointment.getDescription(), is("Doctor appointment"));
+
   }
 
   /**
-   * This unit test will need to be modified (likely deleted) as you implement
-   * your project.
+   * Tests that the description passed into the constructor is stored correctly.
    */
   @Test
-  void initiallyAllAppointmentsHaveTheSameDescription() {
-    Appointment appointment = new Appointment();
-    assertThat(appointment.getDescription(), containsString("not implemented"));
+  void descriptionIsStoredCorrectly() {
+    Appointment appointment = new Appointment("Doctor appointment", "7/18/2025 14:00", "7/18/2025 15:00");
+    assertThat(appointment.getDescription(), is("Doctor appointment"));
   }
 
+  /**
+   * Tests that the begin time is stored and returned correctly from getBeginTimeString().
+   */
   @Test
-  void forProject1ItIsOkayIfGetBeginTimeReturnsNull() {
-    Appointment appointment = new Appointment();
-    assertThat(appointment.getBeginTime(), is(nullValue()));
+  void beginTimeIsStoredCorrectly() {
+    Appointment appointment = new Appointment("Doctor appointment", "7/18/2025 14:00", "7/18/2025 15:00");
+    assertThat(appointment.getBeginTimeString(), is("7/18/2025 14:00"));
+  }
+
+  /**
+   * Tests that the end time is stored and returned correctly from getEndTimeString().
+   */
+  @Test
+  void endTimeIsStoredCorrectly() {
+    Appointment appointment = new Appointment("Doctor appointment", "7/18/2025 14:00", "7/18/2025 15:00");
+    assertThat(appointment.getEndTimeString(), is("7/18/2025 15:00"));
   }
 
 }
