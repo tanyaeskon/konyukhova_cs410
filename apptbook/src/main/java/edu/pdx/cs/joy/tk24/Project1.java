@@ -45,7 +45,12 @@ public class Project1 {
         print = true;
       } else if (arg.equals("-README")) {
         readme = true;
-      } else {
+      }
+      else if (arg.startsWith("-")) {
+        System.err.println("Unknown command line option");
+        return;
+      }
+      else {
         remainingArgs.add(arg);
       }
     }

@@ -94,5 +94,50 @@ class Project1IT extends InvokeMainTestCase {
     assertThat(result.getTextWrittenToStandardError(), containsString("Too many command line arguments"));
   }
 
+  /**
+   * Tests that omitting the end time argument results in an error about missing arguments.
+   */
+  @Test
+  void testMissingEndTimeArgument() {
+    MainMethodResult result = invokeMain(
+            "Tanya",
+            "Doctor Visit",
+            "7/18/2025 14:00"
+    );
+    assertThat(result.getTextWrittenToStandardError(), containsString("Missing command line arguments"));
+  }
+
+
+  /**
+   * Tests that providing an invalid format for the end time results in an error message.
+   */
+  @Test
+  void testInvalidEndTimeFormatPrintsError() {
+    MainMethodResult result = invokeMain(
+            "Tanya",
+            "Doctor Visit",
+            "7/18/2025 14:00",
+            "bad-end-time"
+    );
+    assertThat(result.getTextWrittenToStandardError(), containsString("Invalid end time format"));
+  }
+
+
+  /**
+   * Tests that supplying an unknown option (not -README or -print) produces an error.
+   */
+  @Test
+  void testUnknownOptionTriggersError() {
+    MainMethodResult result = invokeMain(
+            "-fred",
+            "Tanya",
+            "Doctor Visit",
+            "7/18/2025 14:00",
+            "7/18/2025 15:00"
+    );
+    assertThat(result.getTextWrittenToStandardError(), containsString("Unknown command line option"));
+  }
+
+
 
 }
