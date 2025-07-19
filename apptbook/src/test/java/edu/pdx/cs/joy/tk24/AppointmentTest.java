@@ -50,6 +50,7 @@ public class AppointmentTest {
   void endTimeIsStoredCorrectly() {
     Appointment appointment = new Appointment("Doctor appointment", "7/18/2025 14:00", "7/18/2025 15:00");
     assertThat(appointment.getEndTimeString(), is("7/18/2025 15:00"));
+    //comment
   }
 
 }
