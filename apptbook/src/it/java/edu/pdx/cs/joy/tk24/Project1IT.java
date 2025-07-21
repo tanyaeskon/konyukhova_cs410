@@ -49,11 +49,14 @@ class Project1IT extends InvokeMainTestCase {
             "-print",
             "Tanya",
             "Doctor Visit",
-            "7/18/2025 14:00",
-            "7/18/2025 15:00"
+            "7/18/2025", "14:00",
+            "7/18/2025", "15:00"
     );
     assertThat(result.getTextWrittenToStandardOut(), containsString("Doctor Visit"));
     assertThat(result.getTextWrittenToStandardOut(), containsString("7/18/2025 14:00"));
+
+    //assertThat(result.getTextWrittenToStandardOut(), containsString("7/18/2025"));
+   // assertThat(result.getTextWrittenToStandardout(), containsString("14:00"));
   }
 
   /**
@@ -64,8 +67,8 @@ class Project1IT extends InvokeMainTestCase {
     MainMethodResult result = invokeMain(
             "Tanya",
             "Doctor Visit",
-            "not-a-date",
-            "7/18/2025 15:00"
+            "not-a-date", "bad time",
+            "7/18/2025", "15:00"
     );
     assertThat(result.getTextWrittenToStandardError(), containsString("Invalid begin time format"));
   }
@@ -75,7 +78,7 @@ class Project1IT extends InvokeMainTestCase {
    */
   @Test
   void testMissingArgumentsShowsHelpfulError() {
-    MainMethodResult result = invokeMain("Tanya", "Doctor Visit", "7/18/2025 14:00");
+    MainMethodResult result = invokeMain("Tanya", "Doctor Visit", "7/18/2025", "14:00");
     assertThat(result.getTextWrittenToStandardError(), containsString("Missing command line arguments"));
   }
 
@@ -87,8 +90,8 @@ class Project1IT extends InvokeMainTestCase {
     MainMethodResult result = invokeMain(
             "Tanya",
             "Doctor Visit",
-            "7/18/2025 14:00",
-            "7/18/2025 15:00",
+            "7/18/2025", "14:00",
+            "7/18/2025", "15:00",
             "ExtraArg"
     );
     assertThat(result.getTextWrittenToStandardError(), containsString("Too many command line arguments"));
@@ -102,7 +105,7 @@ class Project1IT extends InvokeMainTestCase {
     MainMethodResult result = invokeMain(
             "Tanya",
             "Doctor Visit",
-            "7/18/2025 14:00"
+            "7/18/2025", "14:00"
     );
     assertThat(result.getTextWrittenToStandardError(), containsString("Missing command line arguments"));
   }
@@ -116,8 +119,8 @@ class Project1IT extends InvokeMainTestCase {
     MainMethodResult result = invokeMain(
             "Tanya",
             "Doctor Visit",
-            "7/18/2025 14:00",
-            "bad-end-time"
+            "7/18/2025", "14:00",
+            "bad-end-time", "bad"
     );
     assertThat(result.getTextWrittenToStandardError(), containsString("Invalid end time format"));
   }
@@ -132,8 +135,8 @@ class Project1IT extends InvokeMainTestCase {
             "-fred",
             "Tanya",
             "Doctor Visit",
-            "7/18/2025 14:00",
-            "7/18/2025 15:00"
+            "7/18/2025", "14:00",
+            "7/18/2025",  "15:00"
     );
     assertThat(result.getTextWrittenToStandardError(), containsString("Unknown command line option"));
   }

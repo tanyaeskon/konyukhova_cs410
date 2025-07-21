@@ -1,6 +1,10 @@
 package edu.pdx.cs.joy.tk24;
 
 import com.google.common.annotations.VisibleForTesting;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,12 +49,10 @@ public class Project1 {
         print = true;
       } else if (arg.equals("-README")) {
         readme = true;
-      }
-      else if (arg.startsWith("-")) {
+      } else if (arg.startsWith("-")) {
         System.err.println("Unknown command line option");
         return;
-      }
-      else {
+      } else {
         remainingArgs.add(arg);
       }
     }
@@ -58,36 +60,38 @@ public class Project1 {
     // Print README text and exit
     if (readme) {
       System.out.println("""
-        Project1: Appointment Book Application
-
-        Usage: java -jar target/apptbook-1.0.0.jar [options] <owner> <description> <beginTime> <endTime>
-        Options:
-          -README : Prints this README and exits
-          -print  : Prints the new appointment
-          
-        Arguments:
-          owner       The person who owns the appointment book
-          description A description of the appointment
-          beginTime   When the appointment begins (mm/dd/yyyy hh:mm)
-          endTime     When the appointment ends (mm/dd/yyyy hh:mm)
-      """);
+                Project1: Appointment Book Application
+              
+                Usage: java -jar target/apptbook-1.0.0.jar [options] <owner> <description> <beginTime> <endTime>
+                Options:
+                  -README : Prints this README and exits
+                  -print  : Prints the new appointment
+              
+                Arguments:
+                  owner       The person who owns the appointment book
+                  description A description of the appointment
+                  beginTime   When the appointment begins (mm/dd/yyyy hh:mm)
+                  endTime     When the appointment ends (mm/dd/yyyy hh:mm)
+              """);
       return;
     }
 
     // Validate the number of arguments
-    if (remainingArgs.size() < 4) {
-      System.err.println("Missing command line arguments: owner, description, begin time, or end time");
-      return;
-    } else if (remainingArgs.size() > 4) {
-      System.err.println("Too many command line arguments. Expected: owner, description, begin time, end time");
-      return;
-    }
+      if (remainingArgs.size() < 6) {
+        System.err.println("Missing command line arguments: owner, description, begin time, or end time");
+        return;
+      } else if (remainingArgs.size() > 6) {
+        System.err.println("Too many command line arguments. Expected: owner, description, begin time, end time");
+          return;
+      }
+
+
 
     // Extract appointment details
     String owner = remainingArgs.get(0);
     String description = remainingArgs.get(1);
-    String beginTime = remainingArgs.get(2);
-    String endTime = remainingArgs.get(3);
+    String beginTime = remainingArgs.get(2) + " " + remainingArgs.get(3);
+    String endTime = remainingArgs.get(4) + " " + remainingArgs.get(5);
 
     // Validate description and time format
     if (description.trim().isEmpty()) {
@@ -96,12 +100,12 @@ public class Project1 {
     }
 
     if (!isValidDateTime(beginTime)) {
-      System.err.println("Invalid begin time format. Expected: mm/dd/yyyy hh:mm");
+      System.err.println("Invalid begin time format");
       return;
     }
 
     if (!isValidDateTime(endTime)) {
-      System.err.println("Invalid end time format. Expected: mm/dd/yyyy hh:mm");
+      System.err.println("Invalid end time format");
       return;
     }
 
@@ -122,7 +126,15 @@ public class Project1 {
    * @return true if the input is in a valid format
    */
   static boolean isValidDateTime(String input) {
-    return input.matches("\\d{1,2}/\\d{1,2}/\\d{4} \\d{1,2}:\\d{2}");
+    //return input.matches("\\d{1,2}/\\d{1,2}/\\d{4} \\d{1,2}:\\d{2}");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy H:mm");
+    try {
+      LocalDateTime.parse(input, formatter);
+      return true;
+    } catch (DateTimeParseException e) {
+      return false;
+    }
+
   }
 
 
