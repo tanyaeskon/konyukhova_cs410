@@ -12,6 +12,9 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class TextDumperTest {
 
+  /**
+   * Verifies that the owner's name is included in the text output produced by {@link TextDumper}.
+   */
   @Test
   void appointmentBookOwnerIsDumpedInTextFormat() {
     String owner = "Test Appointment Book";
@@ -25,6 +28,12 @@ public class TextDumperTest {
     assertThat(text, containsString(owner));
   }
 
+  /**
+   * Tests that an {@link AppointmentBook} dumped to a file can be read back
+   * correctly using {@link TextParser}, preserving the owner's name.
+   *
+   * @param tempDir Temporary directory injected by JUnit for safe file writing
+   */
   @Test
   void canParseTextWrittenByTextDumper(@TempDir File tempDir) throws IOException, ParserException {
     String owner = "Test Appointment Book";
@@ -38,4 +47,46 @@ public class TextDumperTest {
     AppointmentBook read = parser.parse();
     assertThat(read.getOwnerName(), equalTo(owner));
   }
+
+  /**
+   * Verifies that the {@link TextParser} throws a {@link ParserException}
+   * when given malformed appointment data without the expected pipe separators.
+   */
+  @Test
+  void parserThrowsOnMalformedLine() {
+    String malformed = """
+      Tanya
+      Incomplete appointment line with no separator
+      """;
+
+    TextParser parser = new TextParser(new StringReader(malformed));
+    org.junit.jupiter.api.Assertions.assertThrows(ParserException.class, parser::parse);
+  }
+
+
+  /**
+   * Tests that an appointment with a description and proper date/time strings
+   * can be dumped and then parsed correctly, preserving all appointment details.
+   */
+  @Test
+  void testFirstAppointmentDescription() throws ParserException, IOException {
+    AppointmentBook book = new AppointmentBook("Tanya");
+    book.addAppointment(new Appointment("Dentist", "07/25/2025, 09:00", "07/25/2025, 10:00"));
+
+    StringWriter writer = new StringWriter();
+    new TextDumper(writer).dump(book);
+
+    StringReader reader = new StringReader(writer.toString());
+    AppointmentBook parsed = new TextParser(reader).parse();
+
+    assertThat(parsed.getOwnerName(), equalTo("Tanya"));
+    assertThat(parsed.getAppointments().size(), equalTo(1));
+
+    for (Appointment appt : parsed.getAppointments()) {
+      assertThat(appt.getDescription(), equalTo("Dentist"));
+      assertThat(appt.getBeginTimeString(), equalTo("07/25/2025, 09:00"));
+      assertThat(appt.getEndTimeString(), equalTo("07/25/2025, 10:00"));
+    }
+  }
+
 }

@@ -55,6 +55,7 @@ public class Appointment extends AbstractAppointment {
    *
    * @return A short description of the appointment
    */
+
   @Override
   public String getDescription() {
     return this.description;

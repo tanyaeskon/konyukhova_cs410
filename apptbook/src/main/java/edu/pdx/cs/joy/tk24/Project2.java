@@ -2,6 +2,7 @@ package edu.pdx.cs.joy.tk24;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -11,7 +12,7 @@ import java.util.List;
 /**
  * The main class for the Appointment Book Project
  */
-public class Project1 {
+public class Project2 {
 
   /**
    * Checks whether the given date and time string has a valid format.
@@ -40,15 +41,25 @@ public class Project1 {
     }
     boolean print = false;
     boolean readme = false;
+    String textFile = null;
 
     List<String> remainingArgs = new ArrayList<>();
-
     // Parse options and arguments
-    for (String arg : args) {
-      if (arg.equals("-print")) {
+    //for (String arg : args) {
+      for(int i = 0; i < args.length; i++){
+          String arg = args[i];
+          if (arg.equals("-print")) {
         print = true;
       } else if (arg.equals("-README")) {
         readme = true;
+      } else if(arg.equals("-textFile")) {
+        //if(i + 1>= args.length)
+          if (i + 1 >= args.length || args[i + 1].startsWith("-"))
+        {
+          System.err.println("Missing filename after -textFile");
+          return;
+        }
+        textFile = args[++i];
       } else if (arg.startsWith("-")) {
         System.err.println("Unknown command line option");
         return;
@@ -60,21 +71,23 @@ public class Project1 {
     // Print README text and exit
     if (readme) {
       System.out.println("""
-                Project1: Appointment Book Application
+                Project2: Appointment Book Application
               
                 Usage: java -jar target/apptbook-1.0.0.jar [options] <owner> <description> <beginTime> <endTime>
                 Options:
                   -README : Prints this README and exits
                   -print  : Prints the new appointment
+                  -textFile file : Reads/writes appointment book from/to a text file
               
                 Arguments:
                   owner       The person who owns the appointment book
                   description A description of the appointment
-                  beginTime   When the appointment begins (mm/dd/yyyy hh:mm)
-                  endTime     When the appointment ends (mm/dd/yyyy hh:mm)
+                  beginTime   When the appointment begins (mm/dd/yyyy HH:mm)
+                  endTime     When the appointment ends (mm/dd/yyyy HH:mm)
               """);
       return;
     }
+
 
     // Validate the number of arguments
       if (remainingArgs.size() < 6) {
@@ -84,6 +97,7 @@ public class Project1 {
         System.err.println("Too many command line arguments. Expected: owner, description, begin time, end time");
           return;
       }
+
 
 
 
@@ -111,13 +125,48 @@ public class Project1 {
 
     Appointment appt = new Appointment(description, beginTime, endTime);
     AppointmentBook book = new AppointmentBook(owner);
+
+    if(textFile != null) {
+      File file = new File(textFile);
+      if (file.exists()) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+          TextParser parser = new TextParser(reader);
+          book = parser.parse();
+
+          if (!book.getOwnerName().equals(owner)) {
+            System.err.println("Invalid owner name");
+            return;
+          }
+
+        } catch (IOException | edu.pdx.cs.joy.ParserException e) {
+          System.err.println(e.getMessage());
+          return;
+        }
+
+      } else {
+        book = new AppointmentBook(owner);
+      }
+    }else{
+      book = new AppointmentBook(owner);
+      }
+
     book.addAppointment(appt);
 
     // Print appointment if requested
     if (print) {
       System.out.println(appt);
     }
+    if(textFile != null) {
+      try (BufferedWriter writer = new BufferedWriter(new FileWriter(textFile))) {
+        TextDumper dumper = new TextDumper(writer);
+        dumper.dump(book);
+      }catch(IOException e){
+        System.err.println(e.getMessage());
+      }
+    }
   }
+
+
 
   /**
    * Validates whether the input matches the expected date/time format: mm/dd/yyyy hh:mm
@@ -125,9 +174,9 @@ public class Project1 {
    * @param input The string to check
    * @return true if the input is in a valid format
    */
+
   static boolean isValidDateTime(String input) {
-    //return input.matches("\\d{1,2}/\\d{1,2}/\\d{4} \\d{1,2}:\\d{2}");
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy H:mm");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/d/yyyy HH:mm");
     try {
       LocalDateTime.parse(input, formatter);
       return true;
