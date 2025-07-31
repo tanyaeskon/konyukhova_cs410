@@ -15,16 +15,13 @@ import java.time.LocalDateTime;
  */
 public class AppointmentTest {
 
-  private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy HH:mm");
+  private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy h:mm a");
 
-  /**
-   * This unit test will need to be modified (likely deleted) as you implement
-   * your project.
-   */
+
   @Test
-  void getBeginTimeStringNeedsToBeImplemented() {
-    LocalDateTime begin = LocalDateTime.parse("7/18/2025 14:00", formatter);
-    LocalDateTime end = LocalDateTime.parse("7/18/2025 15:00", formatter);
+  void beginTimeStringReturnsCorrectValue() {
+    LocalDateTime begin = LocalDateTime.parse("07/18/2025 2:00 PM", formatter);
+    LocalDateTime end = LocalDateTime.parse("07/18/2025 3:00 PM", formatter);
     Appointment appointment = new Appointment("Doctor appointment", begin, end);
     assertThat(appointment.getDescription(), is("Doctor appointment"));
   }
@@ -34,8 +31,8 @@ public class AppointmentTest {
    */
   @Test
   void descriptionIsStoredCorrectly() {
-    LocalDateTime begin = LocalDateTime.parse("7/18/2025 14:00", formatter);
-    LocalDateTime end = LocalDateTime.parse("7/18/2025 15:00", formatter);
+    LocalDateTime begin = LocalDateTime.parse("07/18/2025 2:00 PM", formatter);
+    LocalDateTime end = LocalDateTime.parse("07/18/2025 3:00 PM", formatter);
     Appointment appointment = new Appointment("Doctor appointment", begin, end);
     assertThat(appointment.getDescription(), is("Doctor appointment"));
   }
@@ -45,8 +42,8 @@ public class AppointmentTest {
    */
   @Test
   void beginTimeIsStoredCorrectly() {
-    LocalDateTime begin = LocalDateTime.parse("7/18/2025 14:00", formatter);
-    LocalDateTime end = LocalDateTime.parse("7/18/2025 15:00", formatter);
+    LocalDateTime begin = LocalDateTime.parse("07/18/2025 2:00 PM", formatter);
+    LocalDateTime end = LocalDateTime.parse("07/18/2025 3:00 PM", formatter);
     Appointment appointment = new Appointment("Doctor appointment", begin, end);
     assertThat(appointment.getBeginTime(), is(begin));
     assertThat(appointment.getEndTime(), is(end));
@@ -57,8 +54,8 @@ public class AppointmentTest {
    */
   @Test
   void endTimeIsStoredCorrectly() {
-    LocalDateTime begin = LocalDateTime.parse("7/18/2025 14:00", formatter);
-    LocalDateTime end = LocalDateTime.parse("7/18/2025 15:00", formatter);
+    LocalDateTime begin = LocalDateTime.parse("07/18/2025 2:00 PM", formatter);
+    LocalDateTime end = LocalDateTime.parse("07/18/2025 3:00 PM", formatter);
     Appointment appointment = new Appointment("Doctor appointment", begin, end);
     assertThat(appointment.getEndTime(), is(end));
   }

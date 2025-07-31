@@ -7,6 +7,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -77,8 +78,11 @@ public class TextDumperTest {
   void testFirstAppointmentDescription() throws ParserException, IOException {
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy h:mm a");
+
     LocalDateTime begin = LocalDateTime.parse("07/25/2025 9:00 AM", formatter);
     LocalDateTime end = LocalDateTime.parse("07/25/2025 10:00 AM", formatter);
+
+
 
     AppointmentBook book = new AppointmentBook("Tanya");
     book.addAppointment(new Appointment("Dentist", begin, end));
@@ -92,10 +96,16 @@ public class TextDumperTest {
     assertThat(parsed.getOwnerName(), equalTo("Tanya"));
     assertThat(parsed.getAppointments().size(), equalTo(1));
 
+    DateTimeFormatter localized = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
+
+
+
     for (Appointment appt : parsed.getAppointments()) {
       assertThat(appt.getDescription(), equalTo("Dentist"));
-      assertThat(appt.getBeginTimeString(), equalTo("07/25/2025 9:00 AM"));
-      assertThat(appt.getEndTimeString(), equalTo("07/25/2025 10:00 AM"));
+      assertThat(appt.getBeginTimeString(), equalTo("07/25/25 9:00 AM"));
+      assertThat(appt.getEndTimeString(), equalTo("07/25/25 10:00 AM"));
+
+
     }
   }
 }

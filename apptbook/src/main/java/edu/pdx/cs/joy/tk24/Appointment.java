@@ -49,7 +49,8 @@ public class Appointment extends AbstractAppointment implements Comparable<Appoi
    */
   @Override
   public String getBeginTimeString() {
-    return this.beginTime.format(FORMATTER);
+    //return this.beginTime.format(FORMATTER);
+    return this.beginTime.format(DateTimeFormatter.ofPattern("MM/dd/yy h:mm a"));
   }
 
   /**
@@ -59,7 +60,9 @@ public class Appointment extends AbstractAppointment implements Comparable<Appoi
    */
   @Override
   public String getEndTimeString() {
-    return this.endTime.format(FORMATTER);
+    //return this.endTime.format(FORMATTER);
+    return this.endTime.format(DateTimeFormatter.ofPattern("MM/dd/yy h:mm a"));
+
   }
 
   /**

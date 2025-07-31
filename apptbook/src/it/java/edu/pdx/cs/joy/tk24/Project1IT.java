@@ -253,4 +253,24 @@ class Project1IT extends InvokeMainTestCase {
     MainMethodResult result = invokeMain("-textFile");
     assertThat(result.getTextWrittenToStandardError(), containsString("Missing filename after -textFile"));
   }
+
+  @Test
+  void testPrettyPrintToStandardOutWithTextFile(@TempDir Path tempDir) throws IOException {
+    // Recreate Test 7 scenario
+    File textFile = tempDir.resolve("test.txt").toFile();
+
+    MainMethodResult result = invokeMain(
+            "-textFile", textFile.getAbsolutePath(),
+            "-pretty", "-",  // This was failing before
+            "Project3",
+            "Test 7",
+            "01/08/2025", "8:00", "AM",
+            "01/08/2025", "8:15", "AM"
+    );
+
+    String output = result.getTextWrittenToStandardOut();
+    assertThat(output, containsString("Appointment Book for: Project3"));
+    assertThat(output, containsString("Test 7"));
+    assertThat(output, containsString("Duration"));
+  }
 }

@@ -49,12 +49,27 @@ public class Project3 {
         }
         textFile = args[++i];
 
-      } else if (arg.equals("-pretty")) {
-        if (i + 1 >= args.length || args[i + 1].startsWith("-")) {
+      }
+      //else if (arg.equals("-pretty")) {
+        //if (i + 1 >= args.length || args[i + 1].startsWith("-")) {
+          //System.err.println("Missing filename after -pretty");
+          //return;
+       // }
+        //prettyFile = args[++i];
+      else if (arg.equals("-pretty")) {
+        if (i + 1 >= args.length) {
           System.err.println("Missing filename after -pretty");
           return;
         }
+        String nextArg = args[i + 1];
+        if (nextArg.startsWith("-") && !nextArg.equals("-")) {
+          System.err.println("Missing filename after -pretty");
+          return;
+
+
+        }
         prettyFile = args[++i];
+
       } else if (arg.startsWith("-")) {
         System.err.println("Unknown command line option");
         return;
