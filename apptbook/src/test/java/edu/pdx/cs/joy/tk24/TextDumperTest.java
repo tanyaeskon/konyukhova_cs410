@@ -82,8 +82,6 @@ public class TextDumperTest {
     LocalDateTime begin = LocalDateTime.parse("07/25/2025 9:00 AM", formatter);
     LocalDateTime end = LocalDateTime.parse("07/25/2025 10:00 AM", formatter);
 
-
-
     AppointmentBook book = new AppointmentBook("Tanya");
     book.addAppointment(new Appointment("Dentist", begin, end));
 
@@ -96,14 +94,10 @@ public class TextDumperTest {
     assertThat(parsed.getOwnerName(), equalTo("Tanya"));
     assertThat(parsed.getAppointments().size(), equalTo(1));
 
-    DateTimeFormatter localized = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
-
-
-
     for (Appointment appt : parsed.getAppointments()) {
       assertThat(appt.getDescription(), equalTo("Dentist"));
-      assertThat(appt.getBeginTimeString(), equalTo("07/25/25 9:00 AM"));
-      assertThat(appt.getEndTimeString(), equalTo("07/25/25 10:00 AM"));
+      assertThat(appt.getBeginTimeString(), equalTo("07/25/2025 9:00 AM"));
+      assertThat(appt.getEndTimeString(), equalTo("07/25/2025 10:00 AM"));
 
 
     }

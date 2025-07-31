@@ -21,8 +21,7 @@ public class Appointment extends AbstractAppointment implements Comparable<Appoi
   private final LocalDateTime beginTime;
   private final LocalDateTime endTime;
 
-  private static final DateTimeFormatter FORMATTER =
-          DateTimeFormatter.ofPattern("MM/dd/yyyy h:mm a");
+  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy h:mm a");
 
   /**
    * Constructs a new {@code Appointment} instance.
@@ -49,8 +48,7 @@ public class Appointment extends AbstractAppointment implements Comparable<Appoi
    */
   @Override
   public String getBeginTimeString() {
-    //return this.beginTime.format(FORMATTER);
-    return this.beginTime.format(DateTimeFormatter.ofPattern("MM/dd/yy h:mm a"));
+    return this.beginTime.format(FORMATTER);
   }
 
   /**
@@ -60,8 +58,7 @@ public class Appointment extends AbstractAppointment implements Comparable<Appoi
    */
   @Override
   public String getEndTimeString() {
-    //return this.endTime.format(FORMATTER);
-    return this.endTime.format(DateTimeFormatter.ofPattern("MM/dd/yy h:mm a"));
+    return this.endTime.format(FORMATTER);
 
   }
 
