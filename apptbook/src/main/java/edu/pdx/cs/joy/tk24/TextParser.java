@@ -6,13 +6,25 @@ import edu.pdx.cs.joy.ParserException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 /**
- * A skeletal implementation of the <code>TextParser</code> class for Project 2.
+ * Parses an {@link AppointmentBook} from plain text input.
+ * Expects the first line to contain the owner's name,
+ * followed by one line per appointment in the format:
+ * description | begin time | end time
  */
 public class TextParser implements AppointmentBookParser<AppointmentBook> {
+
   private final Reader reader;
 
+  /**
+   * Creates a new parser with the given reader as its input source.
+   *
+   * @param reader The reader to read text from
+   */
   public TextParser(Reader reader) {
     this.reader = reader;
   }
@@ -20,9 +32,10 @@ public class TextParser implements AppointmentBookParser<AppointmentBook> {
   /**
    * Parses the contents of the text file and returns an {@link AppointmentBook}
    * with the owner and all valid appointments.
-   * <p>
-   * The first line must contain the owner name.
-   * Each following line must be a single appointment with three fields separated by '|'.
+   *
+   * The first line must contain the owner's name.
+   * Each following line must have exactly three fields separated by '|':
+   * description, begin time, and end time.
    *
    * @return The parsed {@link AppointmentBook}
    * @throws ParserException If the file is malformed or an I/O error occurs
@@ -39,9 +52,8 @@ public class TextParser implements AppointmentBookParser<AppointmentBook> {
         throw new ParserException("Missing owner");
       }
 
-     // return new AppointmentBook(owner); remove this because you're returning before reading any of the appointments
-
       AppointmentBook appointmentBook = new AppointmentBook(owner);
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy h:mm a");
 
       String line;
       while ((line = br.readLine()) != null) {
@@ -50,16 +62,21 @@ public class TextParser implements AppointmentBookParser<AppointmentBook> {
         }
         String[] fields = line.split("\\|");
 
-
         if (fields.length != 3) {
           throw new ParserException("Invalid line format");
         }
+
         String description = fields[0].trim();
-        String beginTime = fields[1].trim();
-        String endTime = fields[2].trim();
+        String beginStr = fields[1].trim();
+        String endStr = fields[2].trim();
 
-        appointmentBook.addAppointment(new Appointment(description, beginTime, endTime));
-
+        try {
+          LocalDateTime beginTime = LocalDateTime.parse(beginStr, formatter);
+          LocalDateTime endTime = LocalDateTime.parse(endStr, formatter);
+          appointmentBook.addAppointment(new Appointment(description, beginTime, endTime));
+        } catch (DateTimeParseException e) {
+          throw new ParserException("Invalid date/time format in line: " + line, e);
+        }
       }
       return appointmentBook;
 

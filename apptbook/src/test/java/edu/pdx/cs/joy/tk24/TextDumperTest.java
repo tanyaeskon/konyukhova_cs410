@@ -5,11 +5,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
+/**
+ * Unit tests for the {@link TextDumper} and {@link TextParser} classes.
+ * These tests verify correct serialization and deserialization of {@link AppointmentBook} data.
+ */
 public class TextDumperTest {
 
   /**
@@ -63,15 +69,19 @@ public class TextDumperTest {
     org.junit.jupiter.api.Assertions.assertThrows(ParserException.class, parser::parse);
   }
 
-
   /**
    * Tests that an appointment with a description and proper date/time strings
    * can be dumped and then parsed correctly, preserving all appointment details.
    */
   @Test
   void testFirstAppointmentDescription() throws ParserException, IOException {
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy h:mm a");
+    LocalDateTime begin = LocalDateTime.parse("07/25/2025 9:00 AM", formatter);
+    LocalDateTime end = LocalDateTime.parse("07/25/2025 10:00 AM", formatter);
+
     AppointmentBook book = new AppointmentBook("Tanya");
-    book.addAppointment(new Appointment("Dentist", "07/25/2025, 09:00", "07/25/2025, 10:00"));
+    book.addAppointment(new Appointment("Dentist", begin, end));
 
     StringWriter writer = new StringWriter();
     new TextDumper(writer).dump(book);
@@ -84,9 +94,8 @@ public class TextDumperTest {
 
     for (Appointment appt : parsed.getAppointments()) {
       assertThat(appt.getDescription(), equalTo("Dentist"));
-      assertThat(appt.getBeginTimeString(), equalTo("07/25/2025, 09:00"));
-      assertThat(appt.getEndTimeString(), equalTo("07/25/2025, 10:00"));
+      assertThat(appt.getBeginTimeString(), equalTo("07/25/2025 9:00 AM"));
+      assertThat(appt.getEndTimeString(), equalTo("07/25/2025 10:00 AM"));
     }
   }
-
 }

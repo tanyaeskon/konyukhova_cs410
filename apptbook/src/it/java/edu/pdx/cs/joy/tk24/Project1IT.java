@@ -13,20 +13,20 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+
 /**
- * Integration tests for the {@link Project1} main class.
+ * Integration tests for the {@link Project3} main class.
  */
 class Project1IT extends InvokeMainTestCase {
 
   /**
-   * Helper method to invoke the {@link Project2#main(String[])} method with given arguments.
+   * Helper method to invoke the {@link Project3#main(String[])} method with given arguments.
    *
    * @param args The command line arguments to pass
    * @return A {@code MainMethodResult} containing the output from stdout and stderr
    */
   private MainMethodResult invokeMain(String... args) {
-
-    return invokeMain( Project2.class, args );
+    return invokeMain( Project3.class, args );
   }
 
   /**
@@ -56,14 +56,12 @@ class Project1IT extends InvokeMainTestCase {
             "-print",
             "Tanya",
             "Doctor Visit",
-            "07/18/2025", "14:00",
-            "07/18/2025", "15:00"
+            "07/18/2025", "2:00", "PM",
+            "07/18/2025", "3:00", "PM"
     );
     assertThat(result.getTextWrittenToStandardOut(), containsString("Doctor Visit"));
-    assertThat(result.getTextWrittenToStandardOut(), containsString("07/18/2025 14:00"));
-
-    //assertThat(result.getTextWrittenToStandardOut(), containsString("7/18/2025"));
-   // assertThat(result.getTextWrittenToStandardout(), containsString("14:00"));
+    assertThat(result.getTextWrittenToStandardOut(), containsString("07/18/2025 2:00 PM"));
+    assertThat(result.getTextWrittenToStandardOut(), containsString("7/18/2025 3:00 PM"));
   }
 
   /**
@@ -74,8 +72,8 @@ class Project1IT extends InvokeMainTestCase {
     MainMethodResult result = invokeMain(
             "Tanya",
             "Doctor Visit",
-            "not-a-date", "bad time",
-            "07/18/2025", "15:00"
+            "not-a-date", "bad", "AM",
+            "07/18/2025", "3:00", "PM"
     );
     assertThat(result.getTextWrittenToStandardError(), containsString("Invalid begin time format"));
   }
@@ -85,7 +83,7 @@ class Project1IT extends InvokeMainTestCase {
    */
   @Test
   void testMissingArgumentsShowsHelpfulError() {
-    MainMethodResult result = invokeMain("Tanya", "Doctor Visit", "07/18/2025", "14:00");
+    MainMethodResult result = invokeMain("Tanya", "Doctor Visit", "07/18/2025", "2:00", "PM");
     assertThat(result.getTextWrittenToStandardError(), containsString("Missing command line arguments"));
   }
 
@@ -97,8 +95,8 @@ class Project1IT extends InvokeMainTestCase {
     MainMethodResult result = invokeMain(
             "Tanya",
             "Doctor Visit",
-            "07/18/2025", "14:00",
-            "07/18/2025", "15:00",
+            "07/18/2025", "2:00", "PM",
+            "07/18/2025", "3:00", "PM",
             "ExtraArg"
     );
     assertThat(result.getTextWrittenToStandardError(), containsString("Too many command line arguments"));
@@ -112,7 +110,7 @@ class Project1IT extends InvokeMainTestCase {
     MainMethodResult result = invokeMain(
             "Tanya",
             "Doctor Visit",
-            "07/18/2025", "14:00"
+            "07/18/2025", "2:00", "PM"
     );
     assertThat(result.getTextWrittenToStandardError(), containsString("Missing command line arguments"));
   }
@@ -126,12 +124,11 @@ class Project1IT extends InvokeMainTestCase {
     MainMethodResult result = invokeMain(
             "Tanya",
             "Doctor Visit",
-            "07/18/2025", "14:00",
-            "bad-end-time", "bad"
+            "07/18/2025", "2:00", "PM",
+            "bad-end-time", "bad", "PM"
     );
     assertThat(result.getTextWrittenToStandardError(), containsString("Invalid end time format"));
   }
-
 
   /**
    * Tests that supplying an unknown option (not -README or -print) produces an error.
@@ -142,12 +139,11 @@ class Project1IT extends InvokeMainTestCase {
             "-fred",
             "Tanya",
             "Doctor Visit",
-            "07/18/2025", "14:00",
-            "07/18/2025",  "15:00"
+            "07/18/2025", "2:00", "PM",
+            "07/18/2025", "3:00", "PM"
     );
     assertThat(result.getTextWrittenToStandardError(), containsString("Unknown command line option"));
   }
-
 
   /**
    * Tests that parsing an empty appointment book file throws a ParserException.
@@ -158,13 +154,7 @@ class Project1IT extends InvokeMainTestCase {
     assertNotNull(input, "Could not load empty-apptbook.txt");
 
     TextParser parser = new TextParser(new InputStreamReader(input));
-
-    try {
-      parser.parse();
-      fail("Expected ParserException to be thrown");
-    } catch (ParserException e) {
-      // test passes because exception was thrown
-    }
+    assertThrows(ParserException.class, parser::parse);
   }
 
   /**
@@ -176,25 +166,26 @@ class Project1IT extends InvokeMainTestCase {
    */
   @Test
   void testWriteAppointmentToTextFileWithTextFileOption(@TempDir Path tempDir) throws IOException {
-    // Create a temporary file for the text file
+    //Create a temporary file for the text file
     File textFile = tempDir.resolve("apptbook.txt").toFile();
 
-    // Run the main program with -textFile option
+    //Run the main program with -textFile option
     MainMethodResult result = invokeMain(
             "-textFile", textFile.getAbsolutePath(),
             "Tanya",
             "Study Session",
-            "07/26/2025", "13:00",
-            "07/26/2025", "14:00"
+            "07/26/2025", "1:00", "PM",
+            "07/26/2025", "2:00", "PM"
     );
 
-    // Read the output file to verify it was written
+    assertTrue(textFile.exists());
+
     String content = Files.readString(textFile.toPath());
 
     assertThat(content, containsString("Tanya"));
     assertThat(content, containsString("Study Session"));
     assertThat(content, containsString("07/26/2025"));
-    assertThat(content, containsString("13:00"));
+    assertThat(content, containsString("1:00"));
   }
 
   /**
@@ -208,19 +199,19 @@ class Project1IT extends InvokeMainTestCase {
   void testOwnerMismatchBetweenFileAndCommandLine(@TempDir Path tempDir) throws IOException {
     File textFile = tempDir.resolve("apptbook.txt").toFile();
 
-    // Write an existing appointment with owner "Alice"
+    //Write an existing appointment with owner "Alice"
     Files.writeString(textFile.toPath(), """
       Alice
-      Meeting|07/25/2025 1:00 |07/25/2025 2:00
+      Meeting|07/25/2025 01:00 PM |07/25/2025 02:00 PM
       """);
 
-    // Now run the program with a different owner name
+    //Now run the program with a different owner name
     MainMethodResult result = invokeMain(
             "-textFile", textFile.getAbsolutePath(),
             "Bob",
             "Lunch",
-            "07/26/2025", "12:00",
-            "07/26/2025", "01:00"
+            "07/26/2025", "12:00", "PM",
+            "07/26/2025", "1:00", "PM"
     );
 
     assertThat(result.getTextWrittenToStandardError(), containsString("Invalid owner name"));
@@ -237,7 +228,7 @@ class Project1IT extends InvokeMainTestCase {
   void testMalformedLineTriggersParserException(@TempDir Path tempDir) throws IOException {
     File textFile = tempDir.resolve("apptbook.txt").toFile();
 
-    // Write bad input: Missing separator "|"
+    //Write bad input: Missing separator "|"
     Files.writeString(textFile.toPath(), """
       Tanya
       This is a bad line with no separator
@@ -247,10 +238,9 @@ class Project1IT extends InvokeMainTestCase {
             "-textFile", textFile.getAbsolutePath(),
             "Tanya",
             "Lunch",
-            "08/02/2025", "12:00",
-            "08/02/2025", "13:00"
+            "08/02/2025", "12:00", "PM",
+            "08/02/2025", "1:00", "PM"
     );
-
     assertThat(result.getTextWrittenToStandardError(), containsString("Invalid line format"));
   }
 
@@ -261,8 +251,6 @@ class Project1IT extends InvokeMainTestCase {
   @Test
   void testMissingFilenameAfterTextFileOption() {
     MainMethodResult result = invokeMain("-textFile");
-
     assertThat(result.getTextWrittenToStandardError(), containsString("Missing filename after -textFile"));
   }
-
 }

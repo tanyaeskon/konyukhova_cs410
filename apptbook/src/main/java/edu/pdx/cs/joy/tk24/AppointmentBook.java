@@ -4,21 +4,24 @@ import edu.pdx.cs.joy.AbstractAppointmentBook;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-
 
 /**
  * Represents an appointment book that belongs to a specific owner
- * and stores multiple appointments.
+ * and stores multiple {@link Appointment} entries.
+ *
+ * This class extends {@link AbstractAppointmentBook} and provides
+ * functionality to store, retrieve, and sort appointments.
+ *
  */
-
 public class AppointmentBook extends AbstractAppointmentBook<Appointment> {
   private final String owner;
   private final List<Appointment> appointments;
 
-
   /**
-   * Creates a new appointment book for the given owner.
+   * Creates a new {@code AppointmentBook} for the given owner.
+   *
    * @param owner The name of the appointment book owner.
    */
   public AppointmentBook(String owner) {
@@ -33,7 +36,6 @@ public class AppointmentBook extends AbstractAppointmentBook<Appointment> {
    */
   @Override
   public String getOwnerName() {
-
     return this.owner;
   }
 
@@ -44,8 +46,9 @@ public class AppointmentBook extends AbstractAppointmentBook<Appointment> {
    */
   @Override
   public Collection<Appointment> getAppointments() {
-    //throw new UnsupportedOperationException("This method is not implemented yet");
-    return this.appointments;
+    List<Appointment> sortedAppointments = new ArrayList<>(this.appointments);
+    Collections.sort(sortedAppointments);
+    return sortedAppointments;
   }
 
   /**
@@ -55,7 +58,7 @@ public class AppointmentBook extends AbstractAppointmentBook<Appointment> {
    */
   @Override
   public void addAppointment(Appointment appt) {
-    //throw new UnsupportedOperationException("This method is not implemented yet");
     this.appointments.add(appt);
+    Collections.sort(this.appointments);
   }
 }
