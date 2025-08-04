@@ -21,6 +21,7 @@ accordingly
   <modules>
     <module>student</module>
     <module>apptbook</module>
+    <module>apptbook-web</module>
   </modules>
   <inceptionYear>2025</inceptionYear>
   <organization>
