@@ -13,7 +13,6 @@ import java.net.HttpURLConnection;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * An integration test for {@link Project4} that invokes its main method with
@@ -24,65 +23,131 @@ class Project4IT extends InvokeMainTestCase {
     private static final String HOSTNAME = "localhost";
     private static final String PORT = System.getProperty("http.port", "8080");
 
+    /**
+     * Removes all appointment entries from the server to ensure a clean test environment.
+     * This test runs first to clear any existing data before running other tests.
+     *
+     * @throws IOException if there is an error communicating with the server
+     */
     @Test
     void test0RemoveAllMappings() throws IOException {
       AppointmentBookRestClient client = new AppointmentBookRestClient(HOSTNAME, Integer.parseInt(PORT));
-      client.removeAllDictionaryEntries();
+      client.removeAllAppointmentEntries();
     }
 
+    /**
+     * Tests that invoking Project4 with no command line arguments produces
+     * an appropriate error message. Verifies that the application properly
+     * handles the case when required arguments are missing.
+     */
     @Test
     void test1NoCommandLineArguments() {
         MainMethodResult result = invokeMain( Project4.class );
-        assertThat(result.getTextWrittenToStandardError(), containsString(Project4.MISSING_ARGS));
+        assertThat(result.getTextWrittenToStandardError(), containsString("Missing command line arguments"));
     }
 
+    /**
+     * Tests adding an appointment to an empty server and then searching for it.
+     * This test verifies the complete workflow of adding an appointment and
+     * retrieving it through a search operation with specific date/time range.
+     */
     @Test
     void test2EmptyServer() {
-        MainMethodResult result = invokeMain( Project4.class, HOSTNAME, PORT );
+        String owner = "Test Owner";
+
+        MainMethodResult add = invokeMain(Project4.class,
+                "-host", HOSTNAME, "-port", PORT,
+                owner, "Integration Test Appointment",
+                "08/06/2025 9:00 AM", "08/06/2025 10:00 AM");
+
+
+        assertThat(add.getTextWrittenToStandardError(), equalTo(""));
+
+        MainMethodResult result = invokeMain(Project4.class,
+                "-host", HOSTNAME, "-port", PORT, "-search",
+                owner, "08/06/2025 9:00 AM", "08/06/2025 10:00 AM");
+
 
         assertThat(result.getTextWrittenToStandardError(), equalTo(""));
 
-        String out = result.getTextWrittenToStandardOut();
-        assertThat(out, out, containsString(PrettyPrinter.formatWordCount(0)));
+        String output = result.getTextWrittenToStandardOut();
+        assertThat(output, containsString("Integration Test Appointment"));
     }
 
+    /**
+     * Tests that providing insufficient command line arguments results in
+     * an appropriate error message. Verifies that the application properly
+     * validates the required number of arguments for adding an appointment.
+     */
     @Test
-    void test3NoDefinitionsThrowsAppointmentBookRestException() {
-        String word = "WORD";
-        try {
-            invokeMain(Project4.class, HOSTNAME, PORT, word);
-            fail("Expected a RestException to be thrown");
+    void test3MissingFieldsThrowsRestException() {
+        String owner = "WORD";
 
-        } catch (UncaughtExceptionInMain ex) {
-            RestException cause = (RestException) ex.getCause();
-            assertThat(cause.getHttpStatusCode(), equalTo(HttpURLConnection.HTTP_NOT_FOUND));
-        }
+        MainMethodResult result = invokeMain(Project4.class, "-host", HOSTNAME, "-port", PORT, owner);
+
+        assertThat(result.getTextWrittenToStandardError(), containsString("Expected: owner description begin end"));
+
     }
 
+    /**
+     * Tests adding an appointment with the -print flag to verify that the
+     * appointment details are properly formatted and displayed. Confirms
+     * that the pretty printer functionality works correctly when adding
+     * new appointments.
+     */
     @Test
     void test4AddDefinition() {
-        String word = "WORD";
-        String definition = "DEFINITION";
+        String owner = "Test Owner";
+        String description = "Meeting with team";
 
-        MainMethodResult result = invokeMain( Project4.class, HOSTNAME, PORT, word, definition );
+        MainMethodResult result = invokeMain(Project4.class,
+                "-host", HOSTNAME, "-port", PORT, "-print",
+                owner, description, "08/06/2025 9:00 AM", "08/06/2025 10:00 AM");
 
         assertThat(result.getTextWrittenToStandardError(), equalTo(""));
 
         String out = result.getTextWrittenToStandardOut();
-        assertThat(out, out, containsString(Messages.definedWordAs(word, definition)));
+        assertThat(out, containsString(description));
+        assertThat(out, containsString("2025-08-06"));
 
-        result = invokeMain( Project4.class, HOSTNAME, PORT, word );
+    }
+
+    /**
+     * Tests the -README command line option to verify that it displays
+     * comprehensive usage information. Ensures that all major command line
+     * options and their descriptions are included in the README output.
+     */
+    @Test
+    void test5ReadmeOption() {
+        MainMethodResult result = invokeMain(Project4.class, "-README");
 
         assertThat(result.getTextWrittenToStandardError(), equalTo(""));
 
-        out = result.getTextWrittenToStandardOut();
-        assertThat(out, out, containsString(PrettyPrinter.formatDictionaryEntry(word, definition)));
+        String output = result.getTextWrittenToStandardOut();
+        assertThat(output, containsString("Project4: Appointment Book Application"));
+        assertThat(output, containsString("Usage:"));
+        assertThat(output, containsString("-README"));
+        assertThat(output, containsString("-host"));
+        assertThat(output, containsString("-port"));
+        assertThat(output, containsString("-search"));
+        assertThat(output, containsString("-print"));
+    }
 
-        result = invokeMain( Project4.class, HOSTNAME, PORT );
+    /**
+     * Tests error handling when a host is specified without a corresponding port.
+     * Verifies that the application properly validates that host and port
+     * arguments must be provided together and produces an appropriate error
+     * message when this requirement is violated.
+     */
+    @Test
+    void test6MissingHostWithoutPort() {
+        String owner = "Test Owner";
 
-        assertThat(result.getTextWrittenToStandardError(), equalTo(""));
+        MainMethodResult result = invokeMain(Project4.class,
+                "-host", HOSTNAME,
+                owner, "Test Meeting",
+                "08/06/2025 9:00 AM", "08/06/2025 10:00 AM");
 
-        out = result.getTextWrittenToStandardOut();
-        assertThat(out, out, containsString(PrettyPrinter.formatDictionaryEntry(word, definition)));
+        assertThat(result.getTextWrittenToStandardError(), containsString("Cannot specify host without port"));
     }
 }

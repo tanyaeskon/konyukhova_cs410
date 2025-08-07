@@ -9,38 +9,38 @@ import java.util.Map;
 public class PrettyPrinter {
   private final Writer writer;
 
-  @VisibleForTesting
-  static String formatWordCount(int count )
-  {
-    return String.format( "Dictionary on server contains %d words", count );
-  }
 
-  @VisibleForTesting
-  static String formatDictionaryEntry(String word, String definition )
-  {
-    return String.format("  %s -> %s", word, definition);
-  }
-
-
+  /**
+   * Creates a new PrettyPrinter that writes to the specified writer.
+   *
+   * @param writer the writer to output formatted text to
+   */
   public PrettyPrinter(Writer writer) {
     this.writer = writer;
   }
 
-  public void dump(Map<String, String> dictionary) {
+  /**
+   * Prints an appointment book in a formatted, human-readable style.
+   * Shows owner name, appointment descriptions, times, and calculated durations.
+   *
+   * @param book the appointment book to format and print
+   */
+  public void dump(AppointmentBook book) {
     try (
-      PrintWriter pw = new PrintWriter(this.writer)
+            PrintWriter pw = new PrintWriter(this.writer)
     ) {
+      pw.println("Owner: " + book.getOwnerName());
+      pw.println("Appointments:");
 
-      pw.println(formatWordCount(dictionary.size()));
-
-      for (Map.Entry<String, String> entry : dictionary.entrySet()) {
-        String word = entry.getKey();
-        String definition = entry.getValue();
-        pw.println(formatDictionaryEntry(word, definition));
+      for (Appointment appt : book.getAppointments()) {
+        pw.println("  Description: " + appt.getDescription());
+        pw.println("  Begins at:   " + appt.getBeginTime());
+        pw.println("  Ends at:     " + appt.getEndTime());
+        pw.println("  Duration:    " + appt.getBeginTime().until(appt.getEndTime(), java.time.temporal.ChronoUnit.MINUTES) + " minutes");
+        pw.println();
       }
 
       pw.flush();
     }
-
   }
 }
