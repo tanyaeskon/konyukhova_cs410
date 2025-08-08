@@ -39,7 +39,8 @@ public class Project4 {
         List<String> remainingArgs = new ArrayList<>();
 
         if (args.length == 0) {
-            System.err.println(MISSING_ARGS);
+           // System.err.println(MISSING_ARGS);
+            usage(MISSING_ARGS);
             return;
         }
 
@@ -106,18 +107,16 @@ public class Project4 {
             return;
         }
 
-        if (hostName == null || portString == null) {
-            usage("Missing host and port");
-            return;
-        }
 
-        int port;
-        try {
-            port = Integer.parseInt( portString );
 
-        } catch (NumberFormatException ex) {
-            usage("Port \"" + portString + "\" must be an integer");
-            return;
+        int port = 0;
+        if (portString != null) {
+            try {
+                port = Integer.parseInt(portString);
+            } catch (NumberFormatException ex) {
+                usage("Port \"" + portString + "\" must be an integer");
+                return;
+            }
         }
 
         if (searchFlag) {
@@ -126,29 +125,38 @@ public class Project4 {
                 return;
             } else if (remainingArgs.size() == 1) {
                 owner = remainingArgs.get(0);
-            } else if (remainingArgs.size() == 3) {
+            } else if (remainingArgs.size() == 7) {
                 owner = remainingArgs.get(0);
-                beginTime = remainingArgs.get(1);
-                endTime = remainingArgs.get(2);
+                beginTime = remainingArgs.get(1) + " " + remainingArgs.get(2) + " " + remainingArgs.get(3);
+                endTime = remainingArgs.get(4) + " " + remainingArgs.get(5) + " " + remainingArgs.get(6);
             } else {
                 usage("Search requires owner, or owner with begin and end times");
                 return;
             }
         } else {
-            if (remainingArgs.size() != 4) {
+            if (remainingArgs.size() != 8) {
                 usage("Expected: owner description begin end");
                 return;
             }
             owner = remainingArgs.get(0);
             description = remainingArgs.get(1);
-            beginTime = remainingArgs.get(2);
-            endTime = remainingArgs.get(3);
+            beginTime = remainingArgs.get(2) + " " + remainingArgs.get(3) + " " + remainingArgs.get(4);
+            endTime = remainingArgs.get(5) + " " + remainingArgs.get(6) + " " + remainingArgs.get(7);
         }
 
-        AppointmentBookRestClient client = new AppointmentBookRestClient(hostName, port);
+
+        AppointmentBookRestClient client = null;
+        if (hostName != null && portString != null) {
+            client = new AppointmentBookRestClient(hostName, port);
+        }
 
         try {
             if (searchFlag) {
+                if (client == null) {
+                    error("Host and port required for search operations");
+                    return;
+                }
+
                 String appointments;
                 if (beginTime != null && endTime != null) {
                     appointments = client.getAppointmentsBetween(owner, beginTime, endTime);
@@ -158,9 +166,7 @@ public class Project4 {
 
                 if (appointments == null || appointments.trim().isEmpty()) {
                     System.out.println(Messages.noAppointmentsFound(owner));
-
                 } else {
-
                     StringReader reader = new StringReader(appointments);
                     TextParser parser = new TextParser(reader);
                     AppointmentBook book = parser.parse();
@@ -168,10 +174,14 @@ public class Project4 {
                     PrintWriter writer = new PrintWriter(System.out, true);
                     PrettyPrinter printer = new PrettyPrinter(writer);
                     printer.dump(book);
-
                 }
 
             } else {
+                if (client == null) {
+                    error("Host and port required for adding appointments");
+                    return;
+                }
+
                 client.addAppointment(owner, description, beginTime, endTime);
 
                 if (printFlag) {
@@ -181,12 +191,10 @@ public class Project4 {
                         LocalDateTime endDateTime = LocalDateTime.parse(endTime, formatter);
 
                         Appointment appt = new Appointment(description, beginDateTime, endDateTime);
-                        AppointmentBook book = new AppointmentBook(owner);
-                        book.addAppointment(appt);
 
-                        PrintWriter writer = new PrintWriter(System.out, true);
-                        PrettyPrinter printer = new PrettyPrinter(writer);
-                        printer.dump(book);
+                        System.out.println(appt.toString());
+
+
                     } catch (DateTimeParseException ex) {
                         error("Invalid date/time format: " + ex.getMessage());
                         return;

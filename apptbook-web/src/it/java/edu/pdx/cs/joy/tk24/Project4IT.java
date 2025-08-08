@@ -3,6 +3,7 @@ package edu.pdx.cs.joy.tk24;
 import edu.pdx.cs.joy.InvokeMainTestCase;
 import edu.pdx.cs.joy.UncaughtExceptionInMain;
 import edu.pdx.cs.joy.web.HttpRequestHelper.RestException;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer.MethodName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
+import static java.util.function.Predicate.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -58,14 +60,14 @@ class Project4IT extends InvokeMainTestCase {
         MainMethodResult add = invokeMain(Project4.class,
                 "-host", HOSTNAME, "-port", PORT,
                 owner, "Integration Test Appointment",
-                "08/06/2025 9:00 AM", "08/06/2025 10:00 AM");
+                "08/06/2025", "9:00", "AM", "08/06/2025", "10:00", "AM");
 
 
         assertThat(add.getTextWrittenToStandardError(), equalTo(""));
 
         MainMethodResult result = invokeMain(Project4.class,
                 "-host", HOSTNAME, "-port", PORT, "-search",
-                owner, "08/06/2025 9:00 AM", "08/06/2025 10:00 AM");
+                owner, "08/06/2025", "9:00", "AM", "08/06/2025", "10:00", "AM");
 
 
         assertThat(result.getTextWrittenToStandardError(), equalTo(""));
@@ -102,13 +104,13 @@ class Project4IT extends InvokeMainTestCase {
 
         MainMethodResult result = invokeMain(Project4.class,
                 "-host", HOSTNAME, "-port", PORT, "-print",
-                owner, description, "08/06/2025 9:00 AM", "08/06/2025 10:00 AM");
+                owner, description, "08/06/2025", "9:00", "AM", "08/06/2025", "10:00", "AM");
 
         assertThat(result.getTextWrittenToStandardError(), equalTo(""));
 
         String out = result.getTextWrittenToStandardOut();
         assertThat(out, containsString(description));
-        assertThat(out, containsString("2025-08-06"));
+        assertThat(out, containsString("08/06/2025"));
 
     }
 
@@ -146,8 +148,42 @@ class Project4IT extends InvokeMainTestCase {
         MainMethodResult result = invokeMain(Project4.class,
                 "-host", HOSTNAME,
                 owner, "Test Meeting",
-                "08/06/2025 9:00 AM", "08/06/2025 10:00 AM");
+                "08/06/2025", "9:00", "AM", "08/06/2025", "10:00", "AM");
 
         assertThat(result.getTextWrittenToStandardError(), containsString("Cannot specify host without port"));
     }
+
+    @Test
+    void debugTest3Command() {
+        // This exactly matches Test 3 from the grader
+        String[] args = {
+                "-host", "localhost", "-port", "42346",
+                "Project4", "This is Test 3",
+                "01/06/2025", "6:00", "PM",
+                "01/06/2025", "6:52", "PM"
+        };
+
+        MainMethodResult result = invokeMain(Project4.class, args);
+
+        System.err.println("STDERR: " + result.getTextWrittenToStandardError());
+        System.err.println("STDOUT: " + result.getTextWrittenToStandardOut());
+
+        assertThat(result.getTextWrittenToStandardError(), Matchers.not(containsString("Expected: owner description begin end")));
+    }
+
+
+    /*
+    @Test
+    void graderTest3Exact() {
+        MainMethodResult result = invokeMain(Project4.class,
+                "-host", "localhost", "-port", "42346",
+                "Project4", "This is Test 3",
+                "01/06/2025", "6:00", "PM",
+                "01/06/2025", "6:52", "PM");
+
+        assertThat(result.getTextWrittenToStandardError(), containsString("While contacting server"));
+        assertThat(result.getTextWrittenToStandardError(), not(containsString("Expected: owner description begin end")));
+    }
+     */
+
 }
