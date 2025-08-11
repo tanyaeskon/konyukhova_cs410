@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Appointment Book</string>
+    <string name="hello_class">Hello Class!</string>
+    <string name="show_calculator">Show Calculator</string>
 </resources>
