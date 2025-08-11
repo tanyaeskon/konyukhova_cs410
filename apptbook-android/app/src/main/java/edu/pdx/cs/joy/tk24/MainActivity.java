@@ -1,6 +1,8 @@
 package edu.pdx.cs.joy.tk24;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,5 +22,10 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    public void showCalculator(View view) {
+       Toast toast = Toast.makeText(this, "Showing Calculator", Toast.LENGTH_LONG);;
+       toast.show();
     }
 }
