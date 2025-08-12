@@ -1,5 +1,7 @@
 package edu.pdx.cs.joy.tk24;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -24,8 +26,27 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void showCalculator(View view) {
-       Toast toast = Toast.makeText(this, "Showing Calculator", Toast.LENGTH_LONG);;
-       toast.show();
+    public void addAppointment(View view) {
+        try {
+            startActivity(new Intent(this, AddAppointmentActivity.class));
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "Add screen not created yet", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void searchAppointments(View view) {
+        try {
+            startActivity(new Intent(this, SearchActivity.class));
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "Search screen not created yet", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void PrettyPrint(View view) {
+        try {
+            startActivity(new Intent(this, PrettyPrintActivity.class));
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "Pretty Print screen not created yet", Toast.LENGTH_SHORT).show();
+        }
     }
 }

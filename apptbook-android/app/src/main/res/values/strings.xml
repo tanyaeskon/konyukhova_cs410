@@ -1,5 +1,18 @@
 <resources>
     <string name="app_name">Appointment Book</string>
-    <string name="hello_class">Hello Class!</string>
+    <string name="hello_class">Welcome to the Appointment Book app!</string>
     <string name="show_calculator">Show Calculator</string>
+    <string name="Add_Appointment" />
+    <string name="pretty_print">Pretty Print</string>
+    <string name="add_appointment">Add Appointment</string>
+    <string name="owner">Owner</string>
+    <string name="description">Description</string>
+    <string name="begin_mm_dd_yyyy_h_mm_a">Begin (MM/dd/yyyy h:mm a)</string>
+    <string name="end_mm_dd_yyyy_h_mm_a">End (MM/dd/yyyy h:mm a)</string>
+    <string name="save">Save</string>
+    <string name="search">Search</string>
+    <string name="owner_name">Owner Name:</string>
+    <string name="search_appointments">Search Appointments</string>
+    <string name="enter_owner_name">Enter owner name</string>
+    <string name="clear">Clear</string>
 </resources>
