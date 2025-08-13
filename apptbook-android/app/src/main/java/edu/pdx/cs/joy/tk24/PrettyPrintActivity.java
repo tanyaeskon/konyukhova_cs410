@@ -31,7 +31,6 @@ public class PrettyPrintActivity extends AppCompatActivity {
             return insets;
         });
 
-
         String owner = getIntent().getStringExtra("owner");
         if (owner == null || owner.isEmpty()) {
             owner = getSharedPreferences("prefs", MODE_PRIVATE).getString("lastOwner", "");
@@ -44,19 +43,16 @@ public class PrettyPrintActivity extends AppCompatActivity {
         }
 
         try{
-
-        AppointmentBook book = new AppointmentRepository(this, owner).load(owner);
-
-        StringWriter sw = new StringWriter();
-        new PrettyPrinter(new PrintWriter(sw, true)).dump(book);
-
-        TextView out = findViewById(R.id.output);
-        out.setText(sw.toString());
-    } catch (Exception e) {
+            AppointmentBook book = new AppointmentRepository(this, owner).load(owner);
+            StringWriter sw = new StringWriter();
+            new PrettyPrinter(new PrintWriter(sw, true)).dump(book);
+            TextView out = findViewById(R.id.output);
+            out.setText(sw.toString());
+        }
+        catch (Exception e) {
         showMessage("Error loading/printing appointments:\n" + e.getMessage());
+        }
     }
-
-}
 
     private void showMessage(String msg) {
         new AlertDialog.Builder(this)
@@ -65,7 +61,4 @@ public class PrettyPrintActivity extends AppCompatActivity {
                 .setPositiveButton("OK", (d, w) -> finish())
                 .show();
     }
-
-
-
 }
